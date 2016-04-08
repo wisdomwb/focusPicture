@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+    html,body,h1,h2,h3,h4,h5,h6,div,dl,dt,dd,ul,ol,li,p,blockquote,pre,hr,figure,table,caption,th,td,form,fieldset,legend,input,button,textarea,menu{margin:0;padding:0;}
+	li{list-style: none;}
+    .slider{position: relative;overflow: hidden;width: 320px;height: 220px;margin: 50px auto;}
+    .imgbox{position: absolute;left: -320px;width: 2240px;}
+    .imgbox li{float: left;}
+    .pointerBox{position: absolute;left: 50%;bottom: 20px;transform: translateX(-50%);}
+    .pointerBox li{float:left;width: 10px;height: 10px;border-radius: 5px;background: #000;margin: 0 5px;cursor: pointer;}
+    .pointerBox .on{background: #fff;}
+    .arrow{display: none;z-index: 1;}
+    .arrow li{position: absolute;top: 50%;transform: translateY(-50%);width: 20px;height: 30px;background: rgba(153,153,153,0.6);text-align: center;line-height: 30px;color: #fff;cursor: pointer;}
+    .arrow li:hover{background: rgba(102,102,102,0.6)}
+    .slider:hover .arrow{display: block;}
+    .arrow li:first-child{left: 0}
+    .arrow li:nth-child(2){right: 0}
+    </style>
+</head>
+
+<body>
+	<div class="slider">
+		<ul class="imgbox">
+			<li><img src="images/show4.jpg" alt=""></li>
+	        <li><img src="images/show0.jpg" alt=""></li>
+	        <li><img src="images/show1.jpg" alt=""></li>
+	        <li><img src="images/show2.jpg" alt=""></li>
+	        <li><img src="images/show3.jpg" alt=""></li>
+	        <li><img src="images/show4.jpg" alt=""></li>
+	        <li><img src="images/show0.jpg" alt=""></li>
+	    </ul>
+	    <ul class="pointerBox">
+	    	<li index="0" class="on"></li>
+	    	<li index="1"></li>
+	    	<li index="2"></li>
+	    	<li index="3"></li>
+	    	<li index="4"></li>
+	    </ul>
+	    <ul class="arrow">
+	    	<li id="pre">&lt;</li>
+	    	<li id="nxt">&gt;</li>
+	    </ul>
+	</div>
+    
+    <script type="text/javascript">
+    var imgbox=document.getElementsByClassName('imgbox')[0];
+    var pointer=document.getElementsByClassName('pointerBox')[0].getElementsByTagName('li');
+    var pre=document.getElementById('pre');
+    var nxt=document.getElementById('nxt');
+    imgbox.style.left='-320px';//初始化
+    var stepTime=10;//定义多长时间走一步
+    var step=32;//步数,步数多了走的慢，步数少了走的快
+    var index=0;//当前图片的索引
+    var animated=false;//动画是否在进行
+    var interval;//定时器
+    function animate(distance) {
+    	var temp=parseInt(imgbox.style.left);
+    	(function aStep() {
+    		animated=true;
+    		if (parseInt(imgbox.style.left)==temp+distance) {
+    			if (parseInt(imgbox.style.left)>-320) {imgbox.style.left='-1600px';}
+    			if (parseInt(imgbox.style.left)<-1600) {imgbox.style.left='-320px';}
+    			animated=false;//动画已完成
+    			return;
+    		}
+    		imgbox.style.left=parseInt(imgbox.style.left)+distance/step+'px';
+    		setTimeout(aStep,stepTime);
+    	})()
+    }
+    function pointerShow() {//设置pointer样式
+    	for (var i = 0; i < pointer.length; i++) {
+    		pointer[i].className='';
+    	}
+    	pointer[index].className='on';
+    }
+    for (var i = 0; i < pointer.length; i++) {
+    	pointer[i].addEventListener('click',function () {
+    		if (!animated) {
+    			var distance=(index-this.getAttribute('index'))*320;
+    			animate(distance);
+    			index=parseInt(this.getAttribute('index'));
+    			pointerShow();
+    		}
+    	})
+    }
+    pre.onclick=function () {//点击前一页
+    	if (!animated) {
+    		animate(320);
+    		if (index==0) {
+    			index=4
+    		}else{
+    			index--;
+    		}
+    		pointerShow();
+    	}
+    }
+    nxt.onclick=function () {//点击后一页
+    	if (!animated) {
+    		animate(-320);
+    		if (index==4) {
+    			index=0
+    		}else{
+    			index++;
+    		}
+    		pointerShow();
+    	}
+    }
+    function play() {//自动播放
+    	interval=setInterval(function () {
+    		nxt.onclick();
+    	},5000);
+    }
+    function stop() {//停止自动播放
+    	clearInterval(interval);
+    }
+    play();
+    imgbox.onmouseover=stop;//鼠标移至轮播图上方时停止自动轮播
+    imgbox.onmouseout=play;
+    </script>
+</body>
+
+</html>
